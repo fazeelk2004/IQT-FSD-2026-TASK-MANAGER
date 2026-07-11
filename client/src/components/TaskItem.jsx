@@ -14,6 +14,7 @@ function formatDate(value) {
   });
 }
 
+// A single task card. Presentational — all actions bubble to the parent.
 export default function TaskItem({ task, onToggle, onEdit, onDelete, onPriorityChange }) {
   const priorityClass = PRIORITY_STYLES[task.priority] || PRIORITY_STYLES.medium;
   const checkboxId = `task-${task._id}`;
@@ -30,14 +31,19 @@ export default function TaskItem({ task, onToggle, onEdit, onDelete, onPriorityC
         />
 
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <label
-              htmlFor={checkboxId}
-              className={`cursor-pointer font-semibold ${task.completed ? 'text-slate-400 line-through' : 'text-slate-900'
-                }`}
-            >
-              {task.title}
-            </label>
+          {/* Title on its own line so long titles wrap instead of overflowing.
+              slate-500 (not slate-400) keeps completed titles readable. */}
+          <label
+            htmlFor={checkboxId}
+            className={`block cursor-pointer break-words font-semibold ${
+              task.completed ? 'text-slate-500 line-through' : 'text-slate-900'
+            }`}
+          >
+            {task.title}
+          </label>
+
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            {/* Priority as a discrete quick-change control */}
             <select
               value={task.priority}
               onChange={(e) => onPriorityChange(task._id, e.target.value)}
@@ -50,22 +56,23 @@ export default function TaskItem({ task, onToggle, onEdit, onDelete, onPriorityC
             </select>
 
             <span
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${task.completed
-                ? 'bg-slate-100 text-slate-500'
-                : 'bg-blue-50 text-blue-700'
-                }`}
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                task.completed
+                  ? 'bg-slate-100 text-slate-600'
+                  : 'bg-blue-50 text-blue-700'
+              }`}
             >
               {task.completed ? 'Completed' : 'Active'}
             </span>
           </div>
 
           {task.description && (
-            <p className="mt-1 break-words text-sm text-slate-600">
+            <p className="mt-2 break-words text-sm text-slate-600">
               {task.description}
             </p>
           )}
 
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-slate-500">
             Created {formatDate(task.createdAt)}
           </p>
         </div>

@@ -127,7 +127,7 @@ export default function TaskForm({ onSubmit, editingTask, onCancelEdit, submitti
             placeholder="Optional details…"
             className="mt-1 w-full resize-y rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-slate-500">
             AI suggestions may require review.
           </p>
           {aiError && (

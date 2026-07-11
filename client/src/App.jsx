@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Header from './components/Header.jsx';
 import TaskForm from './components/TaskForm.jsx';
 import TaskFilters from './components/TaskFilters.jsx';
+import TaskSummary from './components/TaskSummary.jsx';
 import TaskList from './components/TaskList.jsx';
 import LoadingSpinner from './components/LoadingSpinner.jsx';
 import ErrorMessage from './components/ErrorMessage.jsx';
@@ -117,11 +118,10 @@ export default function App() {
             <TaskForm onSubmit={handleCreate} submitting={creating} />
           </section>
           <section className="space-y-4">
-            <TaskFilters
-              filter={filter}
-              onFilterChange={setFilter}
-              counts={counts}
-            />
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <TaskSummary counts={counts} />
+              <TaskFilters filter={filter} onFilterChange={setFilter} />
+            </div>
 
             {actionError && (
               <p
@@ -141,6 +141,7 @@ export default function App() {
             {!loading && !error && (
               <TaskList
                 tasks={visibleTasks}
+                filter={filter}
                 onToggle={handleToggle}
                 onEdit={setEditingTask}
                 onDelete={handleDelete}
