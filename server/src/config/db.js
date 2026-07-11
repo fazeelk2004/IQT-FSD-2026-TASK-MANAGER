@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 export async function connectDB() {
-  const uri = process.env.MONGO_URI;
+  const uri = process.env.MONGODB_URI;
 
   if (!uri) {
-    console.warn('MONGO_URI Not Set! Skipping Database Connection.');
+    console.warn('MONGODB_URI Not Set! Skipping Database Connection.');
     return;
   }
 
