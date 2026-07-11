@@ -6,26 +6,36 @@ import TaskFilters from './components/TaskFilters.jsx';
 import TaskList from './components/TaskList.jsx';
 import LoadingSpinner from './components/LoadingSpinner.jsx';
 import ErrorMessage from './components/ErrorMessage.jsx';
-import { mockTasks } from './data/mockTasks.js';
+import * as taskApi from './services/taskApi.js';
 
+// App owns all shared state and talks to the API through taskApi.
+// Children stay presentational and bubble actions up via callbacks.
 export default function App() {
   const [tasks, setTasks] = useState([]);
   const [filter, setFilter] = useState('all');
   const [editingTask, setEditingTask] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
-  const loadTasks = () => {
+  const [loading, setLoading] = useState(true); // initial fetch
+  const [error, setError] = useState(''); // fetch error
+  const [submitting, setSubmitting] = useState(false); // create/update in flight
+  const [actionError, setActionError] = useState(''); // toggle/priority/delete error
+
+  const loadTasks = async () => {
     setLoading(true);
     setError('');
-    const timer = setTimeout(() => {
-      setTasks(mockTasks);
+    try {
+      const data = await taskApi.getTasks();
+      setTasks(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setLoading(false);
-    }, 600);
-    return () => clearTimeout(timer);
+    }
   };
 
-  useEffect(loadTasks, []);
+  useEffect(() => {
+    loadTasks();
+  }, []);
 
   const counts = useMemo(
     () => ({
@@ -42,35 +52,62 @@ export default function App() {
     return tasks;
   }, [tasks, filter]);
 
-  const handleCreateOrUpdate = (payload) => {
-    if (editingTask) {
-      setTasks((prev) =>
-        prev.map((t) =>
-          t._id === editingTask._id ? { ...t, ...payload } : t
-        )
-      );
-      setEditingTask(null);
-      return;
+  // Create (prepend) or update (replace) — guarded against duplicate submits.
+  const handleCreateOrUpdate = async (payload) => {
+    if (submitting) return;
+    setSubmitting(true);
+    setActionError('');
+    try {
+      if (editingTask) {
+        const updated = await taskApi.updateTask(editingTask._id, payload);
+        setTasks((prev) => prev.map((t) => (t._id === updated._id ? updated : t)));
+        setEditingTask(null);
+      } else {
+        const created = await taskApi.createTask(payload);
+        setTasks((prev) => [created, ...prev]);
+      }
+    } catch (err) {
+      setActionError(err.message);
+    } finally {
+      setSubmitting(false);
     }
-
-    const newTask = {
-      _id: crypto.randomUUID(),
-      ...payload,
-      completed: false,
-      createdAt: new Date().toISOString(),
-    };
-    setTasks((prev) => [newTask, ...prev]);
   };
 
-  const handleToggle = (id) => {
-    setTasks((prev) =>
-      prev.map((t) => (t._id === id ? { ...t, completed: !t.completed } : t))
-    );
+  const handleToggle = async (id) => {
+    const task = tasks.find((t) => t._id === id);
+    if (!task) return;
+    setActionError('');
+    try {
+      const updated = await taskApi.setTaskCompleted(id, !task.completed);
+      setTasks((prev) => prev.map((t) => (t._id === id ? updated : t)));
+    } catch (err) {
+      setActionError(err.message);
+    }
   };
 
-  const handleDelete = (id) => {
-    setTasks((prev) => prev.filter((t) => t._id !== id));
-    if (editingTask && editingTask._id === id) setEditingTask(null);
+  const handlePriorityChange = async (id, priority) => {
+    setActionError('');
+    try {
+      const updated = await taskApi.setTaskPriority(id, priority);
+      setTasks((prev) => prev.map((t) => (t._id === id ? updated : t)));
+    } catch (err) {
+      setActionError(err.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const task = tasks.find((t) => t._id === id);
+    const label = task ? `"${task.title}"` : 'this task';
+    if (!window.confirm(`Delete ${label}? This cannot be undone.`)) return;
+
+    setActionError('');
+    try {
+      await taskApi.deleteTask(id);
+      setTasks((prev) => prev.filter((t) => t._id !== id));
+      if (editingTask && editingTask._id === id) setEditingTask(null);
+    } catch (err) {
+      setActionError(err.message);
+    }
   };
 
   return (
@@ -79,20 +116,32 @@ export default function App() {
 
       <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,20rem)_1fr]">
+          {/* Left column: form */}
           <section className="lg:sticky lg:top-6 lg:self-start">
             <TaskForm
               onSubmit={handleCreateOrUpdate}
               editingTask={editingTask}
               onCancelEdit={() => setEditingTask(null)}
+              submitting={submitting}
             />
           </section>
 
+          {/* Right column: filters + list */}
           <section className="space-y-4">
             <TaskFilters
               filter={filter}
               onFilterChange={setFilter}
               counts={counts}
             />
+
+            {actionError && (
+              <p
+                role="alert"
+                className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700"
+              >
+                {actionError}
+              </p>
+            )}
 
             {loading && <LoadingSpinner />}
 
@@ -106,6 +155,7 @@ export default function App() {
                 onToggle={handleToggle}
                 onEdit={setEditingTask}
                 onDelete={handleDelete}
+                onPriorityChange={handlePriorityChange}
               />
             )}
           </section>

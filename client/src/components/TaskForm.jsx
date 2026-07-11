@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 const EMPTY = { title: '', description: '', priority: 'medium' };
 
-export default function TaskForm({ onSubmit, editingTask, onCancelEdit }) {
+export default function TaskForm({ onSubmit, editingTask, onCancelEdit, submitting = false }) {
   const [values, setValues] = useState(EMPTY);
   const [error, setError] = useState('');
 
@@ -28,6 +28,8 @@ export default function TaskForm({ onSubmit, editingTask, onCancelEdit }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (submitting) return;
+
     const title = values.title.trim();
 
     if (title.length < 2) {
@@ -114,9 +116,10 @@ export default function TaskForm({ onSubmit, editingTask, onCancelEdit }) {
         <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="submit"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            disabled={submitting}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isEditing ? 'Update task' : 'Add task'}
+            {submitting ? 'Saving' : isEditing ? 'Update Task' : 'Add task'}
           </button>
           {isEditing && (
             <button

@@ -14,7 +14,7 @@ function formatDate(value) {
   });
 }
 
-export default function TaskItem({ task, onToggle, onEdit, onDelete }) {
+export default function TaskItem({ task, onToggle, onEdit, onDelete, onPriorityChange }) {
   const priorityClass = PRIORITY_STYLES[task.priority] || PRIORITY_STYLES.medium;
   const checkboxId = `task-${task._id}`;
 
@@ -38,17 +38,21 @@ export default function TaskItem({ task, onToggle, onEdit, onDelete }) {
             >
               {task.title}
             </label>
-
-            <span
-              className={`rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${priorityClass}`}
+            <select
+              value={task.priority}
+              onChange={(e) => onPriorityChange(task._id, e.target.value)}
+              aria-label={`Change priority for ${task.title}`}
+              className={`cursor-pointer rounded-full border px-2 py-0.5 text-xs font-medium capitalize focus:outline-none focus:ring-2 focus:ring-blue-500 ${priorityClass}`}
             >
-              {task.priority}
-            </span>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
 
             <span
               className={`rounded-full px-2 py-0.5 text-xs font-medium ${task.completed
-                  ? 'bg-slate-100 text-slate-500'
-                  : 'bg-blue-50 text-blue-700'
+                ? 'bg-slate-100 text-slate-500'
+                : 'bg-blue-50 text-blue-700'
                 }`}
             >
               {task.completed ? 'Completed' : 'Active'}

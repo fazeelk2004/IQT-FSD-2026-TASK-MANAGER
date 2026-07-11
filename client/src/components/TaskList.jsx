@@ -1,7 +1,7 @@
 import TaskItem from './TaskItem.jsx';
 
 // Renders the list of tasks, or an empty state when there are none.
-export default function TaskList({ tasks, onToggle, onEdit, onDelete }) {
+export default function TaskList({ tasks, onToggle, onEdit, onDelete, onPriorityChange }) {
   if (tasks.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-12 text-center">
@@ -22,6 +22,7 @@ export default function TaskList({ tasks, onToggle, onEdit, onDelete }) {
             onToggle={onToggle}
             onEdit={onEdit}
             onDelete={onDelete}
+            onPriorityChange={onPriorityChange}
           />
         </li>
       ))}
