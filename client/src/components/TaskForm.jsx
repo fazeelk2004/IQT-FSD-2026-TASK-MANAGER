@@ -78,7 +78,7 @@ export default function TaskForm({ onSubmit, editingTask, onCancelEdit, submitti
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+      className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-lg shadow-slate-200/50 backdrop-blur sm:p-6"
       aria-label={isEditing ? 'Edit task' : 'Create a new task'}
     >
       <h2 className="text-lg font-semibold text-slate-900">
@@ -113,8 +113,9 @@ export default function TaskForm({ onSubmit, editingTask, onCancelEdit, submitti
               onClick={handleImprove}
               disabled={aiLoading || submitting}
               aria-label="Improve description with AI"
-              className="rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center gap-1 rounded-lg border border-transparent bg-gradient-to-r from-blue-500 to-indigo-500 px-2.5 py-1 text-xs font-semibold text-white shadow-sm shadow-indigo-500/20 transition-all hover:from-blue-600 hover:to-indigo-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
             >
+              <span aria-hidden="true">✨</span>
               {aiLoading ? 'Improving…' : 'Improve with AI'}
             </button>
           </div>
@@ -163,8 +164,8 @@ export default function TaskForm({ onSubmit, editingTask, onCancelEdit, submitti
         <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="submit"
-            disabled={submitting}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={submitting || aiLoading}
+            className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting ? 'Saving' : isEditing ? 'Update Task' : 'Add task'}
           </button>

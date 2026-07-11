@@ -83,7 +83,7 @@ export default function EditTaskModal({ task, onSave, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) requestClose();
       }}
@@ -94,7 +94,7 @@ export default function EditTaskModal({ task, onSave, onClose }) {
         aria-modal="true"
         aria-labelledby="edit-task-heading"
         onKeyDown={handleKeyDown}
-        className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl sm:p-6"
+        className="animate-fade-in-up w-full max-w-md rounded-2xl border border-white/60 bg-white p-5 shadow-2xl shadow-slate-900/20 sm:p-6"
       >
         <h2 id="edit-task-heading" className="text-lg font-semibold text-slate-900">
           Edit task
@@ -167,7 +167,7 @@ export default function EditTaskModal({ task, onSave, onClose }) {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {saving ? 'Saving…' : 'Save'}
             </button>

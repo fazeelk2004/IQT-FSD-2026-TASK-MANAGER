@@ -16,10 +16,10 @@ export default function TaskFilters({ filter, onFilterChange }) {
             type="button"
             onClick={() => onFilterChange(key)}
             aria-pressed={isActive}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+            className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
               isActive
-                ? 'bg-blue-600 text-white'
-                : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-indigo-500/25'
+                : 'border border-slate-200 bg-white/70 text-slate-600 backdrop-blur hover:bg-white hover:text-slate-900'
             }`}
           >
             {label}

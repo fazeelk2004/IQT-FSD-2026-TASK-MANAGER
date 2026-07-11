@@ -389,32 +389,6 @@ Not implemented (by design): authentication, per-user authorization, CSRF tokens
 
 ---
 
-## Screenshots
-
-<!-- TODO: add screenshots -->
-| View            | Screenshot                          |
-|-----------------|-------------------------------------|
-| Dashboard       | `![Dashboard](docs/screenshot-dashboard.png)` |
-| Edit modal      | `![Edit modal](docs/screenshot-edit-modal.png)` |
-| AI improvement  | `![AI improve](docs/screenshot-ai.png)` |
-
-_Replace the placeholders above with real images (e.g. under a `docs/` folder)._
-
----
-
-## Live Demo
-
-- **Frontend:** `<LIVE_FRONTEND_URL>` <!-- TODO -->
-- **Backend/API:** `<LIVE_BACKEND_URL>` <!-- TODO -->
-
----
-
-## GitHub Repository
-
-- **Repository:** `<GITHUB_REPOSITORY_URL>` <!-- TODO -->
-
----
-
 ## Future Improvements
 
 - Automated tests (Jest/Vitest + Supertest for the API, React Testing Library

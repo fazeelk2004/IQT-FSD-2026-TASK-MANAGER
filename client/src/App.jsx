@@ -109,10 +109,20 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="relative min-h-dvh overflow-hidden bg-gradient-to-b from-slate-50 via-white to-indigo-50/40">
+      {/* Decorative background accents */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-blue-300/20 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-40 -right-24 h-72 w-72 rounded-full bg-indigo-300/20 blur-3xl"
+      />
+
       <Header />
 
-      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
+      <main className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,20rem)_1fr]">
           <section className="lg:sticky lg:top-6 lg:self-start">
             <TaskForm onSubmit={handleCreate} submitting={creating} />
