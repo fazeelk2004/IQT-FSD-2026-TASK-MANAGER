@@ -6,10 +6,9 @@ import TaskFilters from './components/TaskFilters.jsx';
 import TaskList from './components/TaskList.jsx';
 import LoadingSpinner from './components/LoadingSpinner.jsx';
 import ErrorMessage from './components/ErrorMessage.jsx';
+import EditTaskModal from './components/EditTaskModal.jsx';
 import * as taskApi from './services/taskApi.js';
 
-// App owns all shared state and talks to the API through taskApi.
-// Children stay presentational and bubble actions up via callbacks.
 export default function App() {
   const [tasks, setTasks] = useState([]);
   const [filter, setFilter] = useState('all');
@@ -17,8 +16,8 @@ export default function App() {
 
   const [loading, setLoading] = useState(true); // initial fetch
   const [error, setError] = useState(''); // fetch error
-  const [submitting, setSubmitting] = useState(false); // create/update in flight
-  const [actionError, setActionError] = useState(''); // toggle/priority/delete error
+  const [creating, setCreating] = useState(false); // create request in flight
+  const [actionError, setActionError] = useState(''); // create/toggle/priority/delete error
 
   const loadTasks = async () => {
     setLoading(true);
@@ -52,25 +51,23 @@ export default function App() {
     return tasks;
   }, [tasks, filter]);
 
-  // Create (prepend) or update (replace) — guarded against duplicate submits.
-  const handleCreateOrUpdate = async (payload) => {
-    if (submitting) return;
-    setSubmitting(true);
+  const handleCreate = async (payload) => {
+    if (creating) return;
+    setCreating(true);
     setActionError('');
     try {
-      if (editingTask) {
-        const updated = await taskApi.updateTask(editingTask._id, payload);
-        setTasks((prev) => prev.map((t) => (t._id === updated._id ? updated : t)));
-        setEditingTask(null);
-      } else {
-        const created = await taskApi.createTask(payload);
-        setTasks((prev) => [created, ...prev]);
-      }
+      const created = await taskApi.createTask(payload);
+      setTasks((prev) => [created, ...prev]);
     } catch (err) {
       setActionError(err.message);
     } finally {
-      setSubmitting(false);
+      setCreating(false);
     }
+  };
+
+  const handleSaveEdit = async (updates) => {
+    const updated = await taskApi.updateTask(editingTask._id, updates);
+    setTasks((prev) => prev.map((t) => (t._id === updated._id ? updated : t)));
   };
 
   const handleToggle = async (id) => {
@@ -116,17 +113,9 @@ export default function App() {
 
       <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,20rem)_1fr]">
-          {/* Left column: form */}
           <section className="lg:sticky lg:top-6 lg:self-start">
-            <TaskForm
-              onSubmit={handleCreateOrUpdate}
-              editingTask={editingTask}
-              onCancelEdit={() => setEditingTask(null)}
-              submitting={submitting}
-            />
+            <TaskForm onSubmit={handleCreate} submitting={creating} />
           </section>
-
-          {/* Right column: filters + list */}
           <section className="space-y-4">
             <TaskFilters
               filter={filter}
@@ -161,6 +150,14 @@ export default function App() {
           </section>
         </div>
       </main>
+
+      {editingTask && (
+        <EditTaskModal
+          task={editingTask}
+          onSave={handleSaveEdit}
+          onClose={() => setEditingTask(null)}
+        />
+      )}
     </div>
   );
 }
