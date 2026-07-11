@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
 
+import * as taskApi from '../services/taskApi.js';
+
 const EMPTY = { title: '', description: '', priority: 'medium' };
 
 export default function TaskForm({ onSubmit, editingTask, onCancelEdit, submitting = false }) {
   const [values, setValues] = useState(EMPTY);
   const [error, setError] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
 
   const isEditing = Boolean(editingTask);
 
@@ -24,6 +28,30 @@ export default function TaskForm({ onSubmit, editingTask, onCancelEdit, submitti
   const handleChange = (event) => {
     const { name, value } = event.target;
     setValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImprove = async () => {
+    if (aiLoading) return;
+
+    const title = values.title.trim();
+    if (title.length === 0) {
+      setAiError('Add a title before using AI.');
+      return;
+    }
+
+    setAiLoading(true);
+    setAiError('');
+    try {
+      const improved = await taskApi.improveTask({
+        title,
+        description: values.description.trim(),
+      });
+      setValues((prev) => ({ ...prev, description: improved }));
+    } catch (err) {
+      setAiError(err.message);
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleSubmit = (event) => {
@@ -76,9 +104,20 @@ export default function TaskForm({ onSubmit, editingTask, onCancelEdit, submitti
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-slate-700">
-            Description
-          </label>
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor="description" className="block text-sm font-medium text-slate-700">
+              Description
+            </label>
+            <button
+              type="button"
+              onClick={handleImprove}
+              disabled={aiLoading || submitting}
+              aria-label="Improve description with AI"
+              className="rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {aiLoading ? 'Improving…' : 'Improve with AI'}
+            </button>
+          </div>
           <textarea
             id="description"
             name="description"
@@ -88,6 +127,14 @@ export default function TaskForm({ onSubmit, editingTask, onCancelEdit, submitti
             placeholder="Optional details…"
             className="mt-1 w-full resize-y rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
+          <p className="mt-1 text-xs text-slate-400">
+            AI suggestions may require review.
+          </p>
+          {aiError && (
+            <p role="alert" className="mt-1 text-sm font-medium text-red-600">
+              {aiError}
+            </p>
+          )}
         </div>
 
         <div>

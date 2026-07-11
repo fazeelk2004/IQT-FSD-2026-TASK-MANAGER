@@ -62,3 +62,13 @@ export function setTaskCompleted(id, completed) {
 export function setTaskPriority(id, priority) {
   return updateTask(id, { priority });
 }
+
+// 7. Improve A Task Description With AI
+export async function improveTask({ title, description }) {
+  try {
+    const res = await api.post('/ai/improve-task', { title, description });
+    return res.data.data.improvedDescription;
+  } catch (error) {
+    throw toError(error);
+  }
+}
